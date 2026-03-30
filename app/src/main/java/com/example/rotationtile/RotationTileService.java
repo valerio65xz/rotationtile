@@ -3,6 +3,7 @@ package com.example.rotationtile;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.provider.Settings;
@@ -32,7 +33,15 @@ public class RotationTileService extends TileService {
         super.onClick();
         toggleRotation();
         updateTile();
-        collapseStatusBar();
+
+        SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
+
+        if (prefs.getBoolean(MainActivity.PREF_BRIGHTNESS, false)) {
+            setBrightnessToMinimum();
+        }
+        if (prefs.getBoolean(MainActivity.PREF_COLLAPSE, true)) {
+            collapseStatusBar();
+        }
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────
@@ -53,8 +62,11 @@ public class RotationTileService extends TileService {
         Tile tile = getQsTile();
         if (tile == null) return;
 
-        ContentResolver cr = getContentResolver();
-        int rotation = Settings.System.getInt(cr, Settings.System.USER_ROTATION, ROTATION_PORTRAIT);
+        int rotation = Settings.System.getInt(
+                getContentResolver(),
+                Settings.System.USER_ROTATION,
+                ROTATION_PORTRAIT
+        );
 
         if (rotation == ROTATION_LANDSCAPE) {
             tile.setState(Tile.STATE_ACTIVE);
@@ -83,6 +95,36 @@ public class RotationTileService extends TileService {
         } else {
             startActivityAndCollapse(intent); // deprecated but only way on Android < 14
         }
+    }
+
+    private void setBrightnessToMinimum() {
+        ContentResolver contentResolver = getContentResolver();
+
+        Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+        );
+        Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS,
+                0
+        );
+    }
+
+    private void setBrightnessToMaximum() {
+        ContentResolver contentResolver = getContentResolver();
+
+        Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+        );
+        Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS,
+                255
+        );
     }
 
 }

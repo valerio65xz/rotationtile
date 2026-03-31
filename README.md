@@ -1,16 +1,15 @@
 <div align="center">
 
 ```
-██████╗  ██████╗ ████████╗ █████╗ ████████╗███████╗
-██╔══██╗██╔═══██╗╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝
-██████╔╝██║   ██║   ██║   ███████║   ██║   █████╗  
-██╔══██╗██║   ██║   ██║   ██╔══██║   ██║   ██╔══╝  
-██║  ██║╚██████╔╝   ██║   ██║  ██║   ██║   ███████╗
-╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝
-                                          T I L E
+███╗   ███╗██╗██████╗ ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ████████╗███████╗
+████╗ ████║██║██╔══██╗██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██╔════╝
+██╔████╔██║██║██████╔╝██████╔╝██║   ██║██████╔╝██╔████╔██║███████║   ██║   █████╗  
+██║╚██╔╝██║██║██╔══██╗██╔══██╗██║   ██║██╔══██╗██║╚██╔╝██║██╔══██║   ██║   ██╔══╝  
+██║ ╚═╝ ██║██║██║  ██║██║  ██║╚██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║   ██║   ███████╗
+╚═╝     ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝
 ```
 
-**A minimal Android Quick Settings tile to lock your screen orientation — instantly.**
+**Your screen mirroring companion — orientation, brightness and voice, all from your pocket.**
 
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen?style=flat-square)](https://developer.android.com/about/versions)
@@ -23,37 +22,40 @@
 
 ## ✦ What is this?
 
-**RotationTile** adds a single tile to your Android Quick Settings panel that toggles your screen between **portrait** and **landscape** — without fumbling through settings menus.
+**MirrorMate** is a lightweight Android utility built for people who do screen mirroring. When your phone is connected to a TV, projector or external display, you shouldn't have to reach for it every time you want to rotate the screen, adjust brightness, or summon your voice assistant.
 
-One tap. Done.
+MirrorMate puts everything in reach — through a Quick Settings tile and volume button gestures — so you can stay in control without ever touching the screen.
 
 ---
 
 ## ✦ Features
 
-- 🔄 &nbsp;**Instant toggle** between portrait and landscape
-- 📌 &nbsp;**Locks orientation** — disables auto-rotate so it stays where you put it
+- 🔄 &nbsp;**Instant rotation toggle** — portrait ↔ landscape from your Quick Settings tile
+- 🔒 &nbsp;**Locks orientation** — disables auto-rotate so it stays exactly where you put it
+- 💡 &nbsp;**Per-orientation brightness** — set a different brightness for portrait and landscape, applied automatically on every toggle
+- 📲 &nbsp;**5× volume down** — toggles rotation without touching the screen or opening Quick Settings
+- 🎙️ &nbsp;**5× volume up** — wakes your voice assistant instantly
+- ⏱️ &nbsp;**Adjustable detection window** — tune how fast the 5× gesture needs to be
 - 🎛️ &nbsp;**Quick Settings tile** — lives right in your notification shade
 - 🪶 &nbsp;**Featherweight** — no background services, no battery drain, no bloat
-- 🔒 &nbsp;**One permission** — only needs `WRITE_SETTINGS` to change rotation
 
 ---
 
 ## ✦ Preview
 
 ```
-┌────────────────────────────────────────┐
-│  Quick Settings                        │
-│                                        │
-│  ┌──────────┐  ┌──────────┐            │
-│  │  Wi-Fi   │  │ Bluetooth│            │
-│  └──────────┘  └──────────┘            │
-│                                        │
-│  ┌──────────┐  ┌──────────┐            │
-│  │ ↻ Rotate │  │ Airplane │            │
-│  │ [tap me] │  │  mode    │            │
-│  └──────────┘  └──────────┘            │
-└────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│  Quick Settings                         │
+│                                         │
+│  ┌──────────┐     ┌──────────┐          │
+│  │  Wi-Fi   │     │Bluetooth │          │
+│  └──────────┘     └──────────┘          │
+│                                         │
+│  ┌──────────┐     ┌──────────┐          │
+│  │ ↻ Rotate │     │ Airplane │          │
+│  │ [tap me] │     │  mode    │          │
+│  └──────────┘     └──────────┘          │
+└─────────────────────────────────────────┘
 ```
 
 ---
@@ -74,8 +76,8 @@ One tap. Done.
 ### 1 — Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/RotationTile.git
-cd RotationTile
+git clone https://github.com/yourusername/mirrormate.git
+cd mirrormate
 ```
 
 ### 2 — Build the APK
@@ -101,49 +103,65 @@ Or run directly from Android Studio with the ▶ button.
 
 ## ✦ Setup (one-time)
 
-> The app needs `WRITE_SETTINGS` to change system rotation. This is a one-time step.
+### Required permission
+1. **Open MirrorMate** from your launcher
+2. Tap **"Continue"** and enable **"Modify system settings"** for MirrorMate
+3. Come back to the app — the settings screen will appear
 
-1. **Open the app** from your launcher — a dialog will appear
-2. Tap **"Open Settings"** and enable the toggle for *Rotation Tile*
-3. Pull down your notification shade and tap the **pencil / edit** icon
-4. Find **"Rotate Screen"** and drag it into your tiles
-5. Done — tap the tile anytime to toggle orientation ✓
+### Add the tile
+1. Pull down your notification shade and tap the **pencil / edit** icon
+2. Find **"Rotate Screen"** and drag it into your tiles
+3. Tap it anytime to toggle orientation ✓
+
+### Enable volume gestures *(optional)*
+> ⚠️ If installed outside the Play Store, Android restricts Accessibility access. Follow the in-app instructions carefully.
+
+1. In the MirrorMate settings screen, tap **"5× volume down = toggle rotation"**
+2. Follow the step-by-step guide to enable the **Accessibility service**
+3. Once enabled, the checkbox activates automatically
 
 ---
 
 ## ✦ How it works
 
 ```
-User taps tile
-      │
-      ▼
-TileService.onClick()
-      │
-      ├─► Read current USER_ROTATION from Settings.System
-      │
-      ├─► Disable ACCELEROMETER_ROTATION (lock auto-rotate off)
-      │
-      ├─► Write opposite rotation value (0° ↔ 90°)
-      │
-      └─► Collapse notification panel
-```
+User taps tile  ─────────────────────────────────────────────────────────┐
+                                                                         │
+Volume down ×5  ──────────────────────────────────────────────────────┐  │
+                                                                      │  ▼
+                                                            RotationHelper.execute()
+                                                                       │
+                                                ┌──────────────────────┼──────────────────────┐
+                                                │                      │                      │
+                                                ▼                      ▼                      ▼
+                                        toggleRotation()       adjustBrightness()     collapseStatusBar()
+                                                │                      │                      │
+                                    Read USER_ROTATION      Read orientation         DismissActivity
+                                    Disable auto-rotate     Apply portrait or        finishes instantly
+                                    Write opposite value    landscape brightness
 
-No background processes. No receivers. No wake locks. The tile service is only alive while the Quick Settings panel is open.
+
+Volume up ×5  ──► ACTION_VOICE_COMMAND  (wakes default voice assistant)
+```
 
 ---
 
 ## ✦ Project structure
 
 ```
-RotationTile/
+MirrorMate/
 ├── app/src/main/
 │   ├── java/com/bin/mirrormate/
-│   │   ├── RotationTileService.java   # Core tile logic
-│   │   ├── MainActivity.java          # Permission setup screen
-│   │   └── DismissActivity.java       # Panel collapse helper
+│   │   ├── MainActivity.java           # Settings screen + permission flow
+│   │   ├── RotationTileService.java    # Quick Settings tile
+│   │   ├── VolumeButtonService.java    # Accessibility + volume gesture detection
+│   │   ├── RotationHelper.java         # Shared rotation + brightness logic
+│   │   └── DismissActivity.java        # Panel collapse helper
 │   ├── res/
-│   │   ├── drawable/                  # Vector icons
-│   │   └── values/strings.xml
+│   │   ├── layout/activity_main.xml    # Settings UI
+│   │   ├── drawable/                   # Vector icons
+│   │   ├── values/strings.xml          # All strings
+│   │   └── xml/accessibility_service_config.xml
 │   └── AndroidManifest.xml
 ├── app/build.gradle
 └── settings.gradle
@@ -155,7 +173,8 @@ RotationTile/
 
 | Permission | Why |
 |------------|-----|
-| `WRITE_SETTINGS` | Required to change `USER_ROTATION` in system settings |
+| `WRITE_SETTINGS` | Required to change rotation and brightness system settings |
+| `BIND_ACCESSIBILITY_SERVICE` | Required to detect volume button presses in background |
 
 No internet. No location. No contacts. No nonsense.
 
@@ -167,6 +186,11 @@ No internet. No location. No contacts. No nonsense.
 |----------------|----------------------|
 | 14+ (API 34+) | `startActivityAndCollapse(PendingIntent)` — official API |
 | 7–13 (API 24–33) | `startActivityAndCollapse(Intent)` — deprecated but functional |
+
+| Install source | Accessibility setup |
+|----------------|----------------------|
+| Play Store | Standard — enable directly in Accessibility settings |
+| Sideloaded APK | Requires "Allow restricted settings" first (Android 13+) |
 
 ---
 
@@ -180,6 +204,6 @@ MIT License — do whatever you want with it.
 
 <div align="center">
 
-Made with ☕ and mild frustration at Android's rotation button
+Made with ☕ for everyone tired of reaching for their phone during screen mirroring
 
 </div>

@@ -124,20 +124,20 @@ Or run directly from Android Studio with the ▶ button.
 ## ✦ How it works
 
 ```
-User taps tile  ────────────────────────────────────────────────────┐
-                                                                    │
-Volume down ×5  ─────────────────────────────────────────────────┐  │
-                                                                 │  ▼
-                                                       RotationHelper.execute()
-                                                                  │
-                                           ┌──────────────────────┼──────────────────────┐
-                                           │                      │                      │
-                                           ▼                      ▼                      ▼
-                                   toggleRotation()       adjustBrightness()     collapseStatusBar()
-                                           │                      │                      │
-                               Read USER_ROTATION      Read orientation         DismissActivity
-                               Disable auto-rotate     Apply portrait or        finishes instantly
-                               Write opposite value    landscape brightness
+User taps tile  ───────────────────────────────────────────────┐
+                                                               │
+Volume down ×5  ────────────────────────────────────────────┐  │
+                                                            │  ▼
+                                                  RotationHelper.execute()
+                                                             │
+                                      ┌──────────────────────┼──────────────────────┐
+                                      │                      │                      │
+                                      ▼                      ▼                      ▼
+                              toggleRotation()       adjustBrightness()     collapseStatusBar()
+                                      │                      │                      │
+                          Read USER_ROTATION      Read orientation         DismissActivity
+                          Disable auto-rotate     Apply portrait or        finishes instantly
+                          Write opposite value    landscape brightness
 
 
 Volume up ×5  ──► ACTION_VOICE_COMMAND  (wakes default voice assistant)

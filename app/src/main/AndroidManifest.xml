@@ -24,7 +24,11 @@
         <activity
             android:name=".DismissActivity"
             android:theme="@android:style/Theme.NoDisplay"
-            android:exported="false" />
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:launchMode="singleInstance" />
 
         <!-- The Quick Settings tile service -->
         <service

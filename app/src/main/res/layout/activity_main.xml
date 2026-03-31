@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_description"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- ── Collapse panel ── -->
+        <CheckBox
+            android:id="@+id/check_collapse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/pref_collapse" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_collapse_hint"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:paddingStart="32dp"
+            android:paddingEnd="0dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- ── Brightness ── -->
+        <CheckBox
+            android:id="@+id/check_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/pref_brightness" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_brightness_hint"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:paddingStart="32dp"
+            android:paddingEnd="0dp"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:id="@+id/layout_brightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingEnd="0dp"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_portrait_brightness"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <SeekBar
+                android:id="@+id/seek_brightness_portrait"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="255"
+                android:progress="128"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_landscape_brightness"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <SeekBar
+                android:id="@+id/seek_brightness_landscape"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="255"
+                android:progress="128" />
+
+        </LinearLayout>
+
+        <!-- ── Volume trigger ── -->
+        <CheckBox
+            android:id="@+id/check_volume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/check_volume" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/volume_hint"
+            android:textSize="12sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:paddingStart="32dp"
+            android:paddingEnd="0dp"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:id="@+id/layout_volume_window"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingEnd="0dp"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_detection_window"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <SeekBar
+                android:id="@+id/seek_volume_window"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="9500"
+                android:progress="1500" />
+
+            <TextView
+                android:id="@+id/tv_volume_window_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

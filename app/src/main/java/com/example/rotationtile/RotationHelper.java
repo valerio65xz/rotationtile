@@ -83,13 +83,19 @@ public class RotationHelper {
     }
 
     /**
-     * Collapses the status bar from general context
+     * Collapses the status bar from general context. Prevents also to put the app again in
+     * foreground
      *
      * @param context The application context
      */
     public static void collapseFromContext(Context context) {
         Intent intent = new Intent(context, DismissActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS |
+                        Intent.FLAG_ACTIVITY_NO_HISTORY
+        );
         context.startActivity(intent);
     }
 

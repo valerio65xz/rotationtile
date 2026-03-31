@@ -7,12 +7,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.InputType;
-import android.view.Gravity;
+import android.view.View;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,28 +25,54 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREF_VOLUME_TRIGGER_WINDOW_MS = "volume_trigger_window_ms";
 
     private AlertDialog activeDialog = null;
+    private SharedPreferences prefs;
+
+    // Views
+    private CheckBox checkCollapse;
+    private CheckBox checkBrightness;
+    private LinearLayout layoutBrightness;
+    private SeekBar seekPortrait;
+    private SeekBar seekLandscape;
+    private CheckBox checkVolume;
+    private LinearLayout layoutVolumeWindow;
+    private SeekBar seekVolumeWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Auto-uncheck volume trigger if accessibility was revoked
+        // If accessibility was revoked, uncheck volume trigger
         if (!isAccessibilityEnabled()) {
-            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                    .edit()
+            prefs.edit()
                     .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false)
                     .apply();
         }
 
         if (!Settings.System.canWrite(this)) {
             showDialog(buildPermissionDialog());
-        } else {
-            showDialog(buildSettingsDialog());
+            return;
+        }
+
+        // If the volume trigger dialog is showing and accessibility just got granted
+        if (activeDialog != null && activeDialog.isShowing() && isAccessibilityEnabled()) {
+            activeDialog.dismiss();
+            prefs.edit()
+                    .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, true)
+                    .apply();
+            checkVolume.setChecked(true);
+            layoutVolumeWindow.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        // First time showing the main screen
+        if (checkCollapse == null) {
+            showMainScreen();
         }
     }
 
@@ -78,25 +103,121 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", (d, w) -> finish());
     }
 
-    private void openWriteSettings() {
-        startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                Uri.parse("package:" + getPackageName())));
+    // ── main screen ───────────────────────────────────────────────────────────
+
+    private void showMainScreen() {
+        setContentView(R.layout.activity_main);
+        bindViews();
+        loadPreferences();
+        attachListeners();
     }
 
-    private void openAccessibilitySettings() {
-        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+    private void bindViews() {
+        checkCollapse      = findViewById(R.id.check_collapse);
+        checkBrightness    = findViewById(R.id.check_brightness);
+        layoutBrightness   = findViewById(R.id.layout_brightness);
+        seekPortrait       = findViewById(R.id.seek_brightness_portrait);
+        seekLandscape      = findViewById(R.id.seek_brightness_landscape);
+        checkVolume        = findViewById(R.id.check_volume);
+        layoutVolumeWindow = findViewById(R.id.layout_volume_window);
+        seekVolumeWindow   = findViewById(R.id.seek_volume_window);
+    }
+
+    private void loadPreferences() {
+        checkCollapse.setChecked(prefs.getBoolean(PREF_COLLAPSE, false));
+
+        boolean brightnessEnabled = prefs.getBoolean(PREF_BRIGHTNESS_ENABLED, false);
+        checkBrightness.setChecked(brightnessEnabled);
+        layoutBrightness.setVisibility(brightnessEnabled ? View.VISIBLE : View.GONE);
+        seekPortrait.setProgress(prefs.getInt(PREF_BRIGHTNESS_PORTRAIT, 128));
+        seekLandscape.setProgress(prefs.getInt(PREF_BRIGHTNESS_LANDSCAPE, 128));
+
+        boolean volumeEnabled = prefs.getBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false);
+        checkVolume.setChecked(volumeEnabled);
+        layoutVolumeWindow.setVisibility(volumeEnabled ? View.VISIBLE : View.GONE);
+        // SeekBar offset: actual ms = progress + 500, so 1500ms default = progress 1000, half = 4750ms
+        seekVolumeWindow.setProgress(prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 2000) - 500);
+    }
+
+    private void attachListeners() {
+        // Collapse
+        checkCollapse.setOnCheckedChangeListener((btn, isChecked) ->
+                prefs.edit().putBoolean(PREF_COLLAPSE, isChecked).apply());
+
+        // Brightness checkbox
+        checkBrightness.setOnCheckedChangeListener((btn, isChecked) -> {
+            prefs.edit().putBoolean(PREF_BRIGHTNESS_ENABLED, isChecked).apply();
+            layoutBrightness.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
+        // Brightness seekbars
+        seekPortrait.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
+            @Override public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
+                if (fromUser) prefs.edit().putInt(PREF_BRIGHTNESS_PORTRAIT, progress).apply();
+            }
+        });
+        seekLandscape.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
+            @Override public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
+                if (fromUser) prefs.edit().putInt(PREF_BRIGHTNESS_LANDSCAPE, progress).apply();
+            }
+        });
+
+        // Volume trigger checkbox — intercept and show permission dialog
+        checkVolume.setOnCheckedChangeListener((btn, isChecked) -> {
+            if (isChecked) {
+                btn.setChecked(false); // revert until permissions confirmed
+                showVolumeTriggerPermissionDialog();
+            } else {
+                prefs.edit().putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false).apply();
+                layoutVolumeWindow.setVisibility(View.GONE);
+            }
+        });
+
+        // Volume window seekbar — offset by 500ms
+        seekVolumeWindow.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
+            @Override public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
+                if (fromUser) prefs.edit()
+                        .putInt(PREF_VOLUME_TRIGGER_WINDOW_MS, progress + 500)
+                        .apply();
+            }
+        });
+
+        TextView tvVolumeWindowValue = findViewById(R.id.tv_volume_window_value);
+
+        // Set initial value text
+        int initialMs = prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 2000);
+        tvVolumeWindowValue.setText(getString(R.string.current_value_ms, initialMs));
+
+        seekVolumeWindow.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
+            @Override public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
+                int ms = progress + 500;
+                tvVolumeWindowValue.setText(getString(R.string.current_value_ms, ms));
+                if (fromUser) prefs.edit()
+                        .putInt(PREF_VOLUME_TRIGGER_WINDOW_MS, ms)
+                        .apply();
+            }
+        });
     }
 
     // ── volume trigger permission dialog ──────────────────────────────────────
 
-    private void showVolumeTriggerPermissionDialog(CheckBox volumeCheckbox) {
+    private void showVolumeTriggerPermissionDialog() {
+        // If already granted, enable directly without showing dialog
+        if (isAccessibilityEnabled()) {
+            prefs.edit()
+                    .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, true)
+                    .apply();
+            checkVolume.setChecked(true);
+            layoutVolumeWindow.setVisibility(View.VISIBLE);
+            return;
+        }
+
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         int p = dpToPx(20);
         layout.setPadding(p, p, p, p);
 
         boolean fromPlayStore = isInstalledFromPlayStore();
-        boolean accessibilityGranted = isAccessibilityEnabled();
         int stepNumber = 1;
 
         // ── Step 1 (sideloaded only): Allow restricted settings ───────────────
@@ -104,39 +225,37 @@ public class MainActivity extends AppCompatActivity {
             addSectionTitle(layout, "Step " + stepNumber++ + " — Allow restricted settings");
             addBody(layout,
                     """
-                            Since this app was installed outside the Play Store, Android restricts
-                            access to the Accessibility service.
-                            
-                            Follow these steps to unlock it:
-                            
-                            ① Go to Settings → Apps → Rotation Tile
-                            
-                            ② Tap the ⋮ three-dot menu in the top-right corner
-                               → Select "Allow restricted settings"
-                            
-                            ⚠️ If the ⋮ menu doesn't appear:
-                               Click on "Open Accessibility" below and enable any toggle
-                            (e.g. "Press power button to end calls").
-                            Then go back to App Info — the ⋮ menu will appear.
-                            You can disable that toggle again afterwards.
-                            
-                            ③ Once allowed, continue to the next step.""");
-            addGoToButton(layout, "Open App Info →", () -> startActivity(
-                    new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:" + getPackageName()))));
+                    Since this app was installed outside the Play Store, Android \
+                    restricts access to the Accessibility service.
+    
+                    Follow these steps to unlock it:
+    
+                    ① Open your phone's Settings
+                       → Apps → App Management → Rotation Tile
+                       → Tap the ⋮ three-dot menu → "Allow restricted settings"
+    
+                    ⚠️ If the ⋮ menu doesn't appear:
+                       → Click on "Open Accessibility" → Downloaded Apps
+                       → Tap "Volume Trigger" — a "Restricted setting" popup will appear
+                       → Tap OK and fully close this app
+                       → Then go to Settings → Apps → App Management → Rotation Tile
+                       → The ⋮ menu will now appear
+                       → Tap it → "Allow restricted settings"
+                       → You can now come back to this app
+    
+                    ③ Once allowed, continue to the next step.""");
             addDivider(layout);
         }
 
         // ── Step 2 (always): Enable accessibility service ─────────────────────
         addSectionTitle(layout, "Step " + stepNumber + " — Enable Accessibility service");
-        addStatusRow(layout, "Volume Trigger service enabled", accessibilityGranted);
-
-        if (!accessibilityGranted) {
-            addBody(layout,
-                    "In the Accessibility settings, find \"Downloaded apps\" " +
-                            "→ tap \"Volume Trigger\" and enable it.");
-            addGoToButton(layout, "Open Accessibility →", this::openAccessibilitySettings);
-        }
+        addBody(layout,
+                """
+                        Go to Settings → Accessibility → Downloaded Apps
+                        → tap "Volume Trigger" and enable it.
+                        
+                        Once enabled, come back here — the checkbox will activate automatically.""");
+        addGoToButton(layout, "Open Accessibility →", this::openAccessibilitySettings);
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.addView(layout);
@@ -145,130 +264,22 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("🔧 Volume trigger setup")
                 .setView(scrollView)
                 .setCancelable(false)
-                .setPositiveButton(accessibilityGranted ? "Enable & Save" : "Close", (d, w) -> {
-                    if (accessibilityGranted) {
-                        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                                .edit()
-                                .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, true)
-                                .apply();
-                        volumeCheckbox.setChecked(true);
-                    } else {
-                        volumeCheckbox.setChecked(false);
-                    }
-                })
-                .setNegativeButton("Cancel", (d, w) -> volumeCheckbox.setChecked(false));
+                .setPositiveButton("Close", (d, w) -> checkVolume.setChecked(false))
+                .setNegativeButton(null, null);
 
         showDialog(builder);
     }
 
-    // ── main settings dialog ──────────────────────────────────────────────────
+    // ── helpers ───────────────────────────────────────────────────────────────
 
-    private AlertDialog.Builder buildSettingsDialog() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        int p = dpToPx(20);
-        layout.setPadding(p, p, p, 0);
-
-        TextView description = new TextView(this);
-        description.setText(getString(R.string.settings_description));
-        description.setTextSize(14);
-        description.setPadding(0, 0, 0, dpToPx(16));
-        layout.addView(description);
-
-        // ── Collapse panel ────────────────────────────────────────────────────
-        CheckBox checkCollapse = new CheckBox(this);
-        checkCollapse.setText(getString(R.string.pref_collapse));
-        checkCollapse.setChecked(prefs.getBoolean(PREF_COLLAPSE, false));
-        layout.addView(checkCollapse);
-        addHint(layout, "Automatically dismisses Quick Settings when the tile is tapped.");
-
-        // ── Brightness per orientation ────────────────────────────────────────
-        CheckBox checkBrightness = new CheckBox(this);
-        checkBrightness.setText(getString(R.string.pref_brightness));
-        checkBrightness.setChecked(prefs.getBoolean(PREF_BRIGHTNESS_ENABLED, false));
-        layout.addView(checkBrightness);
-        addHint(layout, "Applies a different brightness level when switching orientation.");
-
-        LinearLayout portraitRow = buildNumberInputRow(
-                "Portrait brightness (0–255):",
-                prefs.getInt(PREF_BRIGHTNESS_PORTRAIT, 128));
-        EditText portraitInput = (EditText) portraitRow.getChildAt(1);
-        layout.addView(portraitRow);
-
-        LinearLayout landscapeRow = buildNumberInputRow(
-                "Landscape brightness (0–255):",
-                prefs.getInt(PREF_BRIGHTNESS_LANDSCAPE, 50));
-        EditText landscapeInput = (EditText) landscapeRow.getChildAt(1);
-        layout.addView(landscapeRow);
-
-        int brightnessVisibility = checkBrightness.isChecked()
-                ? android.view.View.VISIBLE : android.view.View.GONE;
-        portraitRow.setVisibility(brightnessVisibility);
-        landscapeRow.setVisibility(brightnessVisibility);
-
-        checkBrightness.setOnCheckedChangeListener((btn, isChecked) -> {
-            portraitRow.setVisibility(isChecked
-                    ? android.view.View.VISIBLE : android.view.View.GONE);
-            landscapeRow.setVisibility(isChecked
-                    ? android.view.View.VISIBLE : android.view.View.GONE);
-        });
-
-        // ── Volume trigger ────────────────────────────────────────────────────
-        CheckBox checkVolume = new CheckBox(this);
-        checkVolume.setText(getString(R.string.check_volume));
-        checkVolume.setChecked(prefs.getBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false));
-        layout.addView(checkVolume);
-        addHint(layout, getString(R.string.volume_hint));
-
-        LinearLayout volumeWindowRow = buildNumberInputRow(
-                "Detection window (ms):",
-                prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 2000));
-        volumeWindowRow.getChildAt(1).getLayoutParams().width = dpToPx(80);
-        EditText volumeWindowInput = (EditText) volumeWindowRow.getChildAt(1);
-        layout.addView(volumeWindowRow);
-
-        volumeWindowRow.setVisibility(checkVolume.isChecked()
-                ? android.view.View.VISIBLE : android.view.View.GONE);
-
-        checkVolume.setOnCheckedChangeListener((btn, isChecked) -> {
-            if (isChecked) {
-                btn.setChecked(false);
-                showVolumeTriggerPermissionDialog(checkVolume);
-            } else {
-                volumeWindowRow.setVisibility(android.view.View.GONE);
-                prefs.edit()
-                        .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false)
-                        .apply();
-            }
-        });
-
-        checkVolume.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or2, ob) ->
-                volumeWindowRow.setVisibility(checkVolume.isChecked()
-                        ? android.view.View.VISIBLE : android.view.View.GONE));
-
-        // ── Save ──────────────────────────────────────────────────────────────
-        return new AlertDialog.Builder(this)
-                .setTitle("⚙️ Rotation Tile Settings")
-                .setView(layout)
-                .setCancelable(false)
-                .setPositiveButton("Save & Close", (d, w) -> {
-                    prefs.edit()
-                            .putBoolean(PREF_COLLAPSE, checkCollapse.isChecked())
-                            .putBoolean(PREF_BRIGHTNESS_ENABLED, checkBrightness.isChecked())
-                            .putInt(PREF_BRIGHTNESS_PORTRAIT,
-                                    clampValue(portraitInput.getText().toString(), 128, 0, 255))
-                            .putInt(PREF_BRIGHTNESS_LANDSCAPE,
-                                    clampValue(landscapeInput.getText().toString(), 64, 0, 255))
-                            .putInt(PREF_VOLUME_TRIGGER_WINDOW_MS,
-                                    clampValue(volumeWindowInput.getText().toString(), 2000, 500, 10000))
-                            .apply();
-                    finish();
-                });
+    private void openWriteSettings() {
+        startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                Uri.parse("package:" + getPackageName())));
     }
 
-    // ── layout helpers ────────────────────────────────────────────────────────
+    private void openAccessibilitySettings() {
+        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+    }
 
     private void addSectionTitle(LinearLayout parent, String text) {
         TextView tv = new TextView(this);
@@ -287,25 +298,6 @@ public class MainActivity extends AppCompatActivity {
         parent.addView(tv);
     }
 
-    private void addStatusRow(LinearLayout parent, String label, boolean granted) {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, dpToPx(4), 0, dpToPx(8));
-        row.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView icon = new TextView(this);
-        icon.setText(granted ? "✅ " : "❌ ");
-        icon.setTextSize(16);
-        row.addView(icon);
-
-        TextView tv = new TextView(this);
-        tv.setText(label);
-        tv.setTextSize(13);
-        row.addView(tv);
-
-        parent.addView(row);
-    }
-
     private void addGoToButton(LinearLayout parent, String label, Runnable action) {
         android.widget.Button btn = new android.widget.Button(this);
         btn.setText(label);
@@ -319,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDivider(LinearLayout parent) {
-        android.view.View divider = new android.view.View(this);
+        View divider = new View(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dpToPx(1));
         params.topMargin = dpToPx(8);
@@ -327,51 +319,6 @@ public class MainActivity extends AppCompatActivity {
         divider.setLayoutParams(params);
         divider.setBackgroundColor(0x22888888);
         parent.addView(divider);
-    }
-
-    private void addHint(LinearLayout parent, String text) {
-        TextView hint = new TextView(this);
-        hint.setText(text);
-        hint.setTextSize(12);
-        hint.setAlpha(0.6f);
-        hint.setPadding(dpToPx(32), 0, 0, dpToPx(16));
-        parent.addView(hint);
-    }
-
-    private LinearLayout buildNumberInputRow(String label, int currentValue) {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(dpToPx(32), dpToPx(4), 0, dpToPx(8));
-        row.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView tv = new TextView(this);
-        tv.setText(label);
-        tv.setTextSize(13);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        tv.setLayoutParams(tvParams);
-        row.addView(tv);
-
-        EditText et = new EditText(this);
-        et.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et.setText(String.valueOf(currentValue));
-        et.setSelectAllOnFocus(true);
-        LinearLayout.LayoutParams etParams = new LinearLayout.LayoutParams(
-                dpToPx(60), LinearLayout.LayoutParams.WRAP_CONTENT);
-        et.setLayoutParams(etParams);
-        row.addView(et);
-
-        return row;
-    }
-
-    // ── utils ─────────────────────────────────────────────────────────────────
-
-    private int clampValue(String value, int defaultValue, int min, int max) {
-        try {
-            return Math.min(max, Math.max(min, Integer.parseInt(value)));
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
     }
 
     private boolean isInstalledFromPlayStore() {
@@ -404,6 +351,13 @@ public class MainActivity extends AppCompatActivity {
 
     private int dpToPx(int dp) {
         return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    // ── SimpleSeekBarListener ─────────────────────────────────────────────────
+
+    private abstract static class SimpleSeekBarListener implements SeekBar.OnSeekBarChangeListener {
+        @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+        @Override public void onStopTrackingTouch(SeekBar seekBar) {}
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.rotationtile;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
@@ -11,8 +12,13 @@ public class VolumeButtonService extends AccessibilityService {
 
     private static final int REQUIRED_PRESSES = 5;
 
-    private int pressCount = 0;
-    private long firstPressTime = 0;
+    // Volume down counters
+    private int pressCountDown = 0;
+    private long firstPressTimeDown = 0;
+
+    // Volume up counters
+    private int pressCountUp = 0;
+    private long firstPressTimeUp = 0;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -28,35 +34,65 @@ public class VolumeButtonService extends AccessibilityService {
     protected boolean onKeyEvent(KeyEvent event) {
         SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
 
-        if (!prefs.getBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false)) {
+        if (!prefs.getBoolean(PREF_VOLUME_TRIGGER, false)) {
             return false;
         }
 
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN && event.getAction() == KeyEvent.ACTION_DOWN) {
-            long resetIntervalMs = prefs.getInt(MainActivity.PREF_VOLUME_TRIGGER_WINDOW_MS, 2000);
-            long now = System.currentTimeMillis();
+        if (event.getAction() != KeyEvent.ACTION_DOWN) {
+            return false;
+        }
 
-            // If the user doesn't press 5 times inside the defined time interval, reset the counter
-            if (now - firstPressTime > resetIntervalMs) {
-                pressCount = 0;
-                firstPressTime = now;
+        long resetIntervalMs = prefs.getInt(MainActivity.PREF_VOLUME_TRIGGER_WINDOW_MS, 2000);
+        long now = System.currentTimeMillis();
+
+        // ── Volume down: toggle rotation ──────────────────────────────────────
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if (now - firstPressTimeDown > resetIntervalMs) {
+                pressCountDown = 0;
+                firstPressTimeDown = now;
             }
 
-            pressCount++;
+            pressCountDown++;
 
-            if (pressCount >= REQUIRED_PRESSES) {
-                pressCount = 0;
-                firstPressTime = 0;
-                onFivePressesDetected();
-                return true;
+            if (pressCountDown >= REQUIRED_PRESSES) {
+                pressCountDown = 0;
+                firstPressTimeDown = 0;
+                onFivePressesDownDetected();
+                return true; // consume event — volume won't change
+            }
+        }
+
+        // ── Volume up: wake voice assistant ───────────────────────────────────
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+            if (now - firstPressTimeUp > resetIntervalMs) {
+                pressCountUp = 0;
+                firstPressTimeUp = now;
+            }
+
+            pressCountUp++;
+
+            if (pressCountUp >= REQUIRED_PRESSES) {
+                pressCountUp = 0;
+                firstPressTimeUp = 0;
+                onFivePressesUpDetected();
+                return true; // consume event — volume won't change
             }
         }
 
         return false;
     }
 
-    private void onFivePressesDetected() {
+    // ── actions ───────────────────────────────────────────────────────────────
+
+    private void onFivePressesDownDetected() {
         SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
         RotationHelper.execute(this, prefs, null);
     }
+
+    private void onFivePressesUpDetected() {
+        Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
 }

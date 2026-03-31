@@ -11,8 +11,9 @@
     <string name="pref_brightness_hint">Applies a different brightness level when switching orientation.</string>
     <string name="label_portrait_brightness">Portrait brightness</string>
     <string name="label_landscape_brightness">Landscape brightness</string>
-    <string name="check_volume">5x volume down = toggle rotation</string>
-    <string name="volume_hint">Press volume down 5 times quickly to toggle rotation without opening Quick Settings.</string>
+    <string name="check_volume">5x volume press trigger</string>
+    <string name="volume_down_hint">Press volume down 5 times quickly to toggle rotation without opening Quick Settings.</string>
+    <string name="volume_up_hint">Press volume up 5 times quickly to awake the default vocal assistant.</string>
     <string name="label_detection_window">Detection window (500ms – 10000ms)</string>
     <string name="current_value_ms">Current value: %d ms</string>
     <string name="accessibility_description">Listens for volume down button presses to trigger rotation actions</string>

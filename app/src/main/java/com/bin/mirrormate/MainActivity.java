@@ -1,4 +1,4 @@
-package com.example.rotationtile;
+package com.bin.mirrormate;
 
 import android.app.AlertDialog;
 import android.content.Intent;

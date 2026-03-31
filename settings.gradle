@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RotationTile"
+rootProject.name = "MirrorMate"
 include ':app'

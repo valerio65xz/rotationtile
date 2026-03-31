@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = 'com.example.rotationtile'
+    namespace = 'com.bin.mirrormate'
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.example.rotationtile"
+        applicationId "com.bin.mirrormate"
         minSdk 24
         targetSdk 36
         versionCode 1

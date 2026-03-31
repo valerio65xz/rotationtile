@@ -1,4 +1,4 @@
-package com.example.rotationtile;
+package com.bin.mirrormate;
 
 import android.app.Activity;
 import android.os.Bundle;

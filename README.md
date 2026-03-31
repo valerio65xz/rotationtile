@@ -137,7 +137,7 @@ No background processes. No receivers. No wake locks. The tile service is only a
 ```
 RotationTile/
 ├── app/src/main/
-│   ├── java/com/example/rotationtile/
+│   ├── java/com/bin/mirrormate/
 │   │   ├── RotationTileService.java   # Core tile logic
 │   │   ├── MainActivity.java          # Permission setup screen
 │   │   └── DismissActivity.java       # Panel collapse helper

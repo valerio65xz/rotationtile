@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Rotation Tile</string>
+    <string name="app_name">MirrorMate</string>
     <string name="tile_label">Rotate Screen</string>
     <string name="tile_portrait">Portrait</string>
     <string name="tile_landscape">Landscape</string>

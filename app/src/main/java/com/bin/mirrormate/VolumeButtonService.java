@@ -1,4 +1,4 @@
-package com.example.rotationtile;
+package com.bin.mirrormate;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;

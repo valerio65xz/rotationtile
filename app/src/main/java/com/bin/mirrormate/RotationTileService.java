@@ -1,4 +1,4 @@
-package com.example.rotationtile;
+package com.bin.mirrormate;
 
 import android.content.SharedPreferences;
 import android.service.quicksettings.TileService;

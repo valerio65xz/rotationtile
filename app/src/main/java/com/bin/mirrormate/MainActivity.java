@@ -91,16 +91,11 @@ public class MainActivity extends AppCompatActivity {
 
     private AlertDialog.Builder buildPermissionDialog() {
         return new AlertDialog.Builder(this)
-                .setTitle("⚠️ Permission required")
-                .setMessage("""
-                        This app needs the "Modify system settings" permission
-                        to control screen rotation and brightness.
-                        
-                        Tap Continue to open the permission screen,
-                        then enable the toggle for this app.""")
+                .setTitle(getString(R.string.permission_required_title))
+                .setMessage(getString(R.string.permission_required_message))
                 .setCancelable(false)
-                .setPositiveButton("Continue", (d, w) -> openWriteSettings())
-                .setNegativeButton("Cancel", (d, w) -> finish());
+                .setPositiveButton(getString(R.string.continue_label), (d, w) -> openWriteSettings())
+                .setNegativeButton(getString(R.string.cancel_label), (d, w) -> finish());
     }
 
     // ── main screen ───────────────────────────────────────────────────────────
@@ -218,53 +213,27 @@ public class MainActivity extends AppCompatActivity {
         layout.setPadding(p, p, p, p);
 
         boolean fromPlayStore = isInstalledFromPlayStore();
-        int stepNumber = 1;
 
         // ── Step 1 (sideloaded only): Allow restricted settings ───────────────
         if (!fromPlayStore) {
-            addSectionTitle(layout, "Step " + stepNumber++ + " — Allow restricted settings");
-            addBody(layout,
-                    """
-                    Since this app was installed outside the Play Store, Android \
-                    restricts access to the Accessibility service.
-    
-                    Follow these steps to unlock it:
-    
-                    ① Open your phone's Settings
-                       → Apps → App Management → Rotation Tile
-                       → Tap the ⋮ three-dot menu → "Allow restricted settings"
-    
-                    ⚠️ If the ⋮ menu doesn't appear:
-                       → Click on "Open Accessibility" → Downloaded Apps
-                       → Tap "Volume Trigger" — a "Restricted setting" popup will appear
-                       → Tap OK and fully close this app
-                       → Then go to Settings → Apps → App Management → Rotation Tile
-                       → The ⋮ menu will now appear
-                       → Tap it → "Allow restricted settings"
-                       → You can now come back to this app
-    
-                    ③ Once allowed, continue to the next step.""");
+            addSectionTitle(layout, getString(R.string.allow_restricted_settings_title));
+            addBody(layout, getString(R.string.allow_restricted_settings_message));
             addDivider(layout);
         }
 
         // ── Step 2 (always): Enable accessibility service ─────────────────────
-        addSectionTitle(layout, "Step " + stepNumber + " — Enable Accessibility service");
-        addBody(layout,
-                """
-                        Go to Settings → Accessibility → Downloaded Apps
-                        → tap "Volume Trigger" and enable it.
-                        
-                        Once enabled, come back here — the checkbox will activate automatically.""");
-        addGoToButton(layout, "Open Accessibility →", this::openAccessibilitySettings);
+        addSectionTitle(layout, getString(R.string.enable_accessibility_service_title));
+        addBody(layout, getString(R.string.enable_accessibility_service_message));
+        addGoToButton(layout, getString(R.string.enable_accessibility_button_label), this::openAccessibilitySettings);
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.addView(layout);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle("🔧 Volume trigger setup")
+                .setTitle(getString(R.string.volume_trigger_setup))
                 .setView(scrollView)
                 .setCancelable(false)
-                .setPositiveButton("Close", (d, w) -> checkVolume.setChecked(false))
+                .setPositiveButton(getString(R.string.close_label), (d, w) -> checkVolume.setChecked(false))
                 .setNegativeButton(null, null);
 
         showDialog(builder);

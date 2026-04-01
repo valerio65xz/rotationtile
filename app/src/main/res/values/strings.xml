@@ -4,18 +4,53 @@
     <string name="tile_label">Rotate Screen</string>
     <string name="tile_portrait">Portrait</string>
     <string name="tile_landscape">Landscape</string>
-    <string name="settings_description">Configure what happens each time you tap the rotation tile:</string>
+
+    <string name="settings_description">Configure what happens each time you activate the rotation from tile or volume button:</string>
     <string name="pref_collapse">Close notification panel after toggling</string>
     <string name="pref_collapse_hint">Automatically dismisses Quick Settings when the tile is tapped.</string>
     <string name="pref_brightness">Set brightness per orientation</string>
     <string name="pref_brightness_hint">Applies a different brightness level when switching orientation.</string>
     <string name="label_portrait_brightness">Portrait brightness</string>
     <string name="label_landscape_brightness">Landscape brightness</string>
-    <string name="check_volume">5x volume press trigger</string>
+    <string name="check_volume">Volume press trigger</string>
     <string name="volume_down_hint">Press volume down 5 times quickly to toggle rotation without opening Quick Settings.</string>
     <string name="volume_up_hint">Press volume up 5 times quickly to awake the default vocal assistant.</string>
     <string name="label_detection_window">Detection window (500ms – 10000ms)</string>
     <string name="current_value_ms">Current value: %d ms</string>
+
+    <string name="permission_required_title">⚠️ Permission required</string>
+    <string name="permission_required_message">This app needs the Modify system settings permission to control screen rotation and brightness.\n\n
+
+        Tap Continue to open the permission screen, then enable the toggle for this app.</string>
+    <string name="continue_label">Continue</string>
+    <string name="cancel_label">Cancel</string>
+
+    <string name="allow_restricted_settings_title">Allow restricted settings</string>
+    <string name="allow_restricted_settings_message">Since this app was installed outside the Play Store, Android
+                    restricts access to the Accessibility service.\n\n
+
+                    Follow these steps to unlock it:\n\n
+
+                    1. Open your phone\'s Settings
+                       → Apps → App Management → MirrorMate
+                       → Tap the ⋮ three-dot menu → "Allow restricted settings"\n\n
+
+                    ⚠️ If the ⋮ menu doesn\'t appear:
+                       → Click on "Open Accessibility" → Downloaded Apps
+                       → Tap "Volume Trigger" — a "Restricted setting" popup will appear and tap OK
+                       → Then go to Settings → Apps → App Management → MirrorMate
+                       → The ⋮ menu will now appear on the top right
+                       → Tap it → "Allow restricted settings"
+                       → You can now come back to this app\n\n
+
+                    2. Once allowed, you can set the volume triggers.</string>
+    <string name="enable_accessibility_service_title">Enable Accessibility Service</string>
+    <string name="enable_accessibility_service_message">Go to Settings → Accessibility → Downloaded Apps → tap Volume Trigger and enable it.\n\n
+        Once enabled, come back here — the checkbox will activate automatically.</string>
+    <string name="enable_accessibility_button_label">Open Accessibility</string>
+    <string name="volume_trigger_setup">🔧 Volume trigger setup</string>
+    <string name="close_label">Close</string>
+
     <string name="accessibility_description">Listens for volume down button presses to trigger rotation actions</string>
     <string name="accessibility_title">Volume Trigger</string>
 </resources>

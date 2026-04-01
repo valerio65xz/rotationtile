@@ -4,10 +4,74 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Background -->
     <path
-        android:fillColor="#1976D2"
+        android:fillColor="#1565C0"
         android:pathData="M0,0h108v108H0z"/>
+
+    <!-- TV body -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,22V10L32,32l22,22V42c14.36,0 26,11.64 26,26S68.36,94 54,94 28,82.36 28,68H18c0,19.88 16.12,36 36,36s36,-16.12 36,-36 -16.12,-36 -36,-36z"/>
+        android:fillColor="#0D47A1"
+        android:pathData="M28,18 Q28,13 33,13 L90,13 Q95,13 95,18 L95,68 Q95,73 90,73 L33,73 Q28,73 28,68 Z"/>
+
+    <!-- TV screen surface -->
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M32,17 Q32,15 34,15 L89,15 Q91,15 91,17 L91,67 Q91,69 89,69 L34,69 Q32,69 32,67 Z"/>
+
+    <!-- TV stand stem -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M54,73 L54,82 L69,82 L69,73 Z"/>
+
+    <!-- TV stand base -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M44,82 Q44,85 47,85 L76,85 Q79,85 79,82 L79,80 L44,80 Z"/>
+
+    <!-- Phone body (bottom left) -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M10,72 Q10,68 14,68 L30,68 Q34,68 34,72 L34,100 Q34,104 30,104 L14,104 Q10,104 10,100 Z"/>
+
+    <!-- Phone screen -->
+    <path
+        android:fillColor="#42A5F5"
+        android:pathData="M13,76 Q13,74 15,74 L29,74 Q31,74 31,76 L31,97 Q31,99 29,99 L15,99 Q13,99 13,97 Z"/>
+
+    <!-- Phone notch -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M18,69 Q18,67 22,67 Q26,67 26,69 L26,72 L18,72 Z"/>
+
+    <!-- Cast signal wave 1 (faint) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#90CAF9"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.4"
+        android:pathData="M35,78 Q48,62 58,42"/>
+
+    <!-- Cast signal wave 2 (medium) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#90CAF9"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.65"
+        android:pathData="M35,84 Q52,66 65,42"/>
+
+    <!-- Cast signal wave 3 (strong) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#90CAF9"
+        android:strokeWidth="2.5"
+        android:strokeAlpha="0.9"
+        android:pathData="M35,90 Q56,70 72,42"/>
+
+    <!-- Arrow head pointing at TV screen -->
+    <path
+        android:fillColor="#90CAF9"
+        android:pathData="M68,35 L65,46 L76,43 Z"/>
+
 </vector>

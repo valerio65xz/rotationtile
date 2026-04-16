@@ -51,7 +51,7 @@ public class VolumeButtonService extends AccessibilityService {
         }
 
         long now = System.currentTimeMillis();
-        long windowMs = prefs.getInt(MainActivity.PREF_VOLUME_TRIGGER_WINDOW_MS, 2000);
+        long windowMs = prefs.getInt(MainActivity.PREF_VOLUME_TRIGGER_WINDOW_MS, 5000);
 
         // Reset buffer if detection window expired
         if (lastPressTime > 0 && (now - lastPressTime) > windowMs) {

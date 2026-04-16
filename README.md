@@ -1,5 +1,3 @@
-<div align="center">
-
 ```
 ███╗   ███╗██╗██████╗ ██████╗  ██████╗ ██████╗ ███╗   ███╗ █████╗ ████████╗███████╗
 ████╗ ████║██║██╔══██╗██╔══██╗██╔═══██╗██╔══██╗████╗ ████║██╔══██╗╚══██╔══╝██╔════╝
@@ -15,15 +13,13 @@
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen?style=flat-square)](https://developer.android.com/about/versions)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 
-</div>
-
 ---
 
 ## ✦ What is this?
 
 **MirrorMate** is a lightweight Android utility built for people who do screen mirroring. When your phone is connected to a TV, projector or external display, you shouldn't have to reach for it every time you want to rotate the screen, adjust brightness, or summon your voice assistant.
 
-MirrorMate puts everything in reach — through a Quick Settings tile and volume button gestures — so you can stay in control without ever touching the screen.
+MirrorMate puts everything in reach — through a Quick Settings tile and fully customizable volume button gestures — so you can stay in control without ever touching the screen.
 
 ---
 
@@ -32,9 +28,10 @@ MirrorMate puts everything in reach — through a Quick Settings tile and volume
 - 🔄 &nbsp;**Instant rotation toggle** — portrait ↔ landscape from your Quick Settings tile
 - 🔒 &nbsp;**Locks orientation** — disables auto-rotate so it stays exactly where you put it
 - 💡 &nbsp;**Per-orientation brightness** — set a different brightness for portrait and landscape, applied automatically on every toggle
-- 📲 &nbsp;**5× volume down** — toggles rotation without touching the screen or opening Quick Settings
-- 🎙️ &nbsp;**5× volume up** — wakes your voice assistant instantly
-- ⏱️ &nbsp;**Adjustable detection window** — tune how fast the 5× gesture needs to be
+- 🎛️ &nbsp;**Custom volume trigger sequences** — define your own up/down button pattern (3–8 presses) to toggle rotation or wake your voice assistant
+- 🎙️ &nbsp;**Voice assistant trigger** — custom volume sequence wakes your default voice assistant instantly
+- ⏱️ &nbsp;**Adjustable detection window** — tune how fast the gesture needs to be (500ms–10000ms)
+- 📵 &nbsp;**Call-aware** — volume triggers are automatically paused during phone calls
 - 🎛️ &nbsp;**Quick Settings tile** — lives right in your notification shade
 - 🪶 &nbsp;**Featherweight** — no background services, no battery drain, no bloat
 
@@ -115,33 +112,66 @@ Or run directly from Android Studio with the ▶ button.
 ### Enable volume gestures *(optional)*
 > ⚠️ If installed outside the Play Store, Android restricts Accessibility access. Follow the in-app instructions carefully.
 
-1. In the MirrorMate settings screen, tap **"5× volume down = toggle rotation"**
-2. Follow the step-by-step guide to enable the **Accessibility service**
-3. Once enabled, the checkbox activates automatically
+1. Tick **"Volume trigger"** in the MirrorMate settings screen
+2. Grant the **"Read phone state"** permission — required to pause triggers during calls
+3. Follow the step-by-step guide to enable the **Accessibility service**
+4. Once enabled, the checkbox activates automatically
+5. Optionally configure your own custom trigger sequences
+
+### Configure custom trigger sequences *(optional)*
+1. With volume trigger enabled, tap **"Configure rotation sequence"** or **"Configure voice sequence"**
+2. Press volume up/down buttons in your desired pattern (3–8 presses)
+3. Tap **Save** — MirrorMate validates that sequences don't conflict with each other
 
 ---
 
 ## ✦ How it works
 
 ```
-User taps tile  ────────────────────────────────────────────┐
-                                                            │
-Volume down ×5  ─────────────────────────────────────────┐  │
-                                                         │  ▼
-                                               RotationHelper.execute()
-                                                          │
-                                   ┌──────────────────────┼──────────────────────┐
-                                   │                      │                      │
-                                   ▼                      ▼                      ▼
-                           toggleRotation()       adjustBrightness()     collapseStatusBar()
-                                   │                      │                      │
-                       Read USER_ROTATION      Read orientation         DismissActivity
-                       Disable auto-rotate     Apply portrait or        finishes instantly
-                       Write opposite value    landscape brightness
+User taps tile  ────────────────────────────────────────────────────┐
+                                                                    │
+Custom volume sequence matched  ─────────────────────────────────┐  │
+                                                                 │  ▼
+                                                       RotationHelper.execute()
+                                                                  │
+                                       ┌──────────────────────────┼──────────────────────┐
+                                       │                          │                      │
+                                       ▼                          ▼                      ▼
+                               toggleRotation()         adjustBrightness()     collapseStatusBar()
+                                       │                          │                      │
+                           Read USER_ROTATION          Read new orientation     DismissActivity
+                           Disable auto-rotate         Apply portrait or        finishes instantly
+                           Write opposite value        landscape brightness
 
 
-Volume up ×5  ──► ACTION_VOICE_COMMAND  (wakes default voice assistant)
+Custom voice sequence matched  ──► ACTION_VOICE_COMMAND  (wakes default voice assistant)
+
+
+VolumeButtonService buffer logic:
+
+  on every volume key press:
+    │
+    ├─► detection window expired? ──► reset buffer
+    │
+    ├─► append press to buffer (▼ or ▲)
+    │
+    ├─► buffer ends with rotation sequence? ──► fire rotation, reset buffer
+    │
+    ├─► buffer ends with voice sequence? ──► fire voice, reset buffer
+    │
+    └─► buffer length > longest sequence? ──► reset buffer
 ```
+
+---
+
+## ✦ Sequence configuration rules
+
+- Minimum **3 presses**, maximum **8 presses**
+- The two sequences (rotation and voice) must not be **identical**
+- Neither sequence can be a **prefix** of the other — would always trigger the shorter one first
+- Default rotation sequence: `▼ ▼ ▼ ▼ ▼`
+- Default voice sequence: `▲ ▲ ▲ ▲ ▲`
+- Triggers are **paused during phone calls** and while the sequence recorder is open
 
 ---
 
@@ -152,12 +182,15 @@ MirrorMate/
 ├── app/src/main/
 │   ├── java/com/bin/mirrormate/
 │   │   ├── MainActivity.java           # Settings screen + permission flow
+│   │   ├── SequenceActivity.java       # Custom trigger sequence recorder
 │   │   ├── RotationTileService.java    # Quick Settings tile
 │   │   ├── VolumeButtonService.java    # Accessibility + volume gesture detection
 │   │   ├── RotationHelper.java         # Shared rotation + brightness logic
 │   │   └── DismissActivity.java        # Panel collapse helper
 │   ├── res/
-│   │   ├── layout/activity_main.xml    # Settings UI
+│   │   ├── layout/
+│   │   │   ├── activity_main.xml       # Settings UI
+│   │   │   └── activity_sequence.xml  # Sequence recorder UI
 │   │   ├── drawable/                   # Vector icons
 │   │   ├── values/strings.xml          # All strings
 │   │   └── xml/accessibility_service_config.xml
@@ -174,6 +207,7 @@ MirrorMate/
 |------------|-----|
 | `WRITE_SETTINGS` | Required to change rotation and brightness system settings |
 | `BIND_ACCESSIBILITY_SERVICE` | Required to detect volume button presses in background |
+| `READ_PHONE_STATE` | Required to pause volume triggers during active phone calls |
 
 No internet. No location. No contacts. No nonsense.
 
@@ -201,8 +235,4 @@ MIT License — do whatever you want with it.
 
 ---
 
-<div align="center">
-
 Made with ☕ for everyone tired of reaching for their phone during screen mirroring
-
-</div>

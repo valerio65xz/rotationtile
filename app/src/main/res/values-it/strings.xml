@@ -37,6 +37,7 @@
     <string name="sequence_instructions">▼ = volume giu   ▲ = volume su \nPremi i tasti volume per registrare la tua sequenza.</string>
     <string name="sequence_clear">Reset</string>
     <string name="sequence_save">Salva</string>
+    <string name="phone_state_denied_message">Per evitare di attivare il trigger volume durante le chiamate, l\'app necessita il permesso di poter gestire le chiamate. Senza di esso, il trigger volume non verrà abilitato.</string>
     <string name="sequence_error_equal">Questa sequenza è già in uso. Per favore scegline una diversa</string>
     <string name="sequence_error_prefix_of_other">Questa sequenza è una sotto sequenza dell\'altra già impostata, impedendone l\'utilizzo. Impostane una differente</string>
     <string name="sequence_error_other_prefix">L\'altra sequenza è una sotto sequenza di questa generata, impedendone l\'utilizzo. Impostane una differente</string>

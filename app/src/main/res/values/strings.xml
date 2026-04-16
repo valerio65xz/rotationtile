@@ -63,6 +63,7 @@
     <string name="sequence_instructions">▼ = volume down   ▲ = volume up\nPress volume buttons to record your sequence.</string>
     <string name="sequence_clear">Clear</string>
     <string name="sequence_save">Save</string>
+    <string name="phone_state_denied_message">The \"Read phone state\" permission is required to pause volume triggers during phone calls. The volume trigger cannot be enabled without it.</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">This sequence is identical to the other trigger. Choose a different one.</string>

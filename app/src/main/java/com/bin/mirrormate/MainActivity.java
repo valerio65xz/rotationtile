@@ -3,6 +3,7 @@ package com.bin.mirrormate;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String PREF_VOLUME_TRIGGER_WINDOW_MS = "volume_trigger_window_ms";
     public static final String PREF_ROTATION_SEQUENCE = "rotation_sequence";
     public static final String PREF_VOICE_SEQUENCE    = "voice_sequence";
+
+    private static final int REQUEST_PHONE_STATE = 1001;
 
     private AlertDialog activeDialog = null;
     private SharedPreferences prefs;
@@ -51,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // If accessibility was revoked, uncheck volume trigger
-        if (!isAccessibilityEnabled()) {
+        // Auto-uncheck volume trigger if accessibility or phone state permission was revoked
+        if (!isAccessibilityEnabled() || !isPhoneStateGranted()) {
             prefs.edit()
                     .putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false)
                     .apply();
         }
 
-        // Refresh current user sequence
+        // Refresh sequence previews when returning from SequenceActivity
         if (tvRotationSequencePreview != null) {
             tvRotationSequencePreview.setText(sequenceToReadable(
                     prefs.getString(PREF_ROTATION_SEQUENCE, "0,0,0,0,0")));
@@ -85,12 +92,6 @@ public class MainActivity extends AppCompatActivity {
         // First time showing the main screen
         if (checkCollapse == null) {
             showMainScreen();
-            if (tvRotationSequencePreview != null) {
-                tvRotationSequencePreview.setText(sequenceToReadable(
-                        prefs.getString(PREF_ROTATION_SEQUENCE, "0,0,0,0,0")));
-                tvVoiceSequencePreview.setText(sequenceToReadable(
-                        prefs.getString(PREF_VOICE_SEQUENCE, "1,1,1,1,1")));
-            }
         }
     }
 
@@ -126,14 +127,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
-        checkCollapse      = findViewById(R.id.check_collapse);
-        checkBrightness    = findViewById(R.id.check_brightness);
-        layoutBrightness   = findViewById(R.id.layout_brightness);
-        seekPortrait       = findViewById(R.id.seek_brightness_portrait);
-        seekLandscape      = findViewById(R.id.seek_brightness_landscape);
-        checkVolume        = findViewById(R.id.check_volume);
-        layoutVolumeWindow = findViewById(R.id.layout_volume_window);
-        seekVolumeWindow   = findViewById(R.id.seek_volume_window);
+        checkCollapse             = findViewById(R.id.check_collapse);
+        checkBrightness           = findViewById(R.id.check_brightness);
+        layoutBrightness          = findViewById(R.id.layout_brightness);
+        seekPortrait              = findViewById(R.id.seek_brightness_portrait);
+        seekLandscape             = findViewById(R.id.seek_brightness_landscape);
+        checkVolume               = findViewById(R.id.check_volume);
+        layoutVolumeWindow        = findViewById(R.id.layout_volume_window);
+        seekVolumeWindow          = findViewById(R.id.seek_volume_window);
         tvRotationSequencePreview = findViewById(R.id.tv_rotation_sequence_preview);
         tvVoiceSequencePreview    = findViewById(R.id.tv_voice_sequence_preview);
     }
@@ -150,13 +151,12 @@ public class MainActivity extends AppCompatActivity {
         boolean volumeEnabled = prefs.getBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false);
         checkVolume.setChecked(volumeEnabled);
         layoutVolumeWindow.setVisibility(volumeEnabled ? View.VISIBLE : View.GONE);
-        // SeekBar offset: actual ms = progress + 500, so 1500ms default = progress 1000, half = 4750ms
-        seekVolumeWindow.setProgress(prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 2000) - 500);
+        seekVolumeWindow.setProgress(prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 5000) - 500);
+
         tvRotationSequencePreview.setText(sequenceToReadable(
                 prefs.getString(PREF_ROTATION_SEQUENCE, "0,0,0,0,0")));
         tvVoiceSequencePreview.setText(sequenceToReadable(
                 prefs.getString(PREF_VOICE_SEQUENCE, "1,1,1,1,1")));
-
     }
 
     private void attachListeners() {
@@ -182,30 +182,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Volume trigger checkbox — intercept and show permission dialog
+        // Volume trigger checkbox — request phone state first, then accessibility
         checkVolume.setOnCheckedChangeListener((btn, isChecked) -> {
             if (isChecked) {
-                btn.setChecked(false); // revert until permissions confirmed
-                showVolumeTriggerPermissionDialog();
+                btn.setChecked(false); // revert until all permissions confirmed
+                requestPhoneStatePermission();
             } else {
                 prefs.edit().putBoolean(VolumeButtonService.PREF_VOLUME_TRIGGER, false).apply();
                 layoutVolumeWindow.setVisibility(View.GONE);
             }
         });
 
-        // Volume window seekbar — offset by 500ms
-        seekVolumeWindow.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
-            @Override public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
-                if (fromUser) prefs.edit()
-                        .putInt(PREF_VOLUME_TRIGGER_WINDOW_MS, progress + 500)
-                        .apply();
-            }
-        });
-
+        // Volume window seekbar
         TextView tvVolumeWindowValue = findViewById(R.id.tv_volume_window_value);
-
-        // Set initial value text
-        int initialMs = prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 2000);
+        int initialMs = prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 5000);
         tvVolumeWindowValue.setText(getString(R.string.current_value_ms, initialMs));
 
         seekVolumeWindow.setOnSeekBarChangeListener(new SimpleSeekBarListener() {
@@ -218,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Sequence configure buttons
         findViewById(R.id.btn_configure_rotation).setOnClickListener(v -> {
             Intent intent = new Intent(this, SequenceActivity.class);
             intent.putExtra(SequenceActivity.EXTRA_TARGET, SequenceActivity.TARGET_ROTATION);
@@ -228,6 +219,56 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(SequenceActivity.EXTRA_TARGET, SequenceActivity.TARGET_VOICE);
             startActivity(intent);
         });
+    }
+
+    // ── phone state permission ────────────────────────────────────────────────
+
+    private void requestPhoneStatePermission() {
+        if (isPhoneStateGranted()) {
+            showVolumeTriggerPermissionDialog();
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this, android.Manifest.permission.READ_PHONE_STATE)) {
+            // First denial — can ask again via system dialog
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{android.Manifest.permission.READ_PHONE_STATE},
+                    REQUEST_PHONE_STATE);
+        } else {
+            // Permanently denied — send to app settings
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.permission_required_title))
+                    .setMessage(getString(R.string.phone_state_denied_message))
+                    .setPositiveButton("Open Settings", (d, w) -> {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(getString(R.string.cancel_label),
+                            (d, w) -> checkVolume.setChecked(false))
+                    .show();
+        }
+    }
+
+    private boolean isPhoneStateGranted() {
+        return ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PHONE_STATE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Granted — proceed to accessibility check
+                showVolumeTriggerPermissionDialog();
+            } else {
+                // Denied — warn user and keep checkbox unchecked
+                checkVolume.setChecked(false);
+            }
+        }
     }
 
     // ── volume trigger permission dialog ──────────────────────────────────────
@@ -260,7 +301,8 @@ public class MainActivity extends AppCompatActivity {
         // ── Step 2 (always): Enable accessibility service ─────────────────────
         addSectionTitle(layout, getString(R.string.enable_accessibility_service_title));
         addBody(layout, getString(R.string.enable_accessibility_service_message));
-        addGoToButton(layout, getString(R.string.enable_accessibility_button_label), this::openAccessibilitySettings);
+        addGoToButton(layout, getString(R.string.enable_accessibility_button_label),
+                this::openAccessibilitySettings);
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.addView(layout);
@@ -269,7 +311,8 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(getString(R.string.volume_trigger_setup))
                 .setView(scrollView)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.close_label), (d, w) -> checkVolume.setChecked(false))
+                .setPositiveButton(getString(R.string.close_label),
+                        (d, w) -> checkVolume.setChecked(false))
                 .setNegativeButton(null, null);
 
         showDialog(builder);
@@ -375,5 +418,4 @@ public class MainActivity extends AppCompatActivity {
         @Override public void onStartTrackingTouch(SeekBar seekBar) {}
         @Override public void onStopTrackingTouch(SeekBar seekBar) {}
     }
-
 }

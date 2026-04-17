@@ -13,7 +13,8 @@
     <string name="label_portrait_brightness">Luminosité en portrait</string>
     <string name="label_landscape_brightness">Luminosité en paysage</string>
     <string name="check_volume">Déclenchement par touches de volume</string>
-    <string name="volume_trigger_hint">Configurez des séquences de touches de volume pour déclencher manuellement la rotation avec vos paramètres personnalisés, ou l\'assistant vocal par défaut</string>
+    <string name="volume_trigger_hint">Configurez des séquences de touches de volume pour déclencher manuellement la rotation avec vos paramètres personnalisés, ou l\'assistant vocal par défaut.</string>
+    <string name="voice_lockscreen_note">Remarque : si vous avez activé « Hey Google » sur l\'écran de verrouillage ou le raccourci vers l\'assistant vocal dans les paramètres de votre appareil, l\'assistant vocal peut également se déclencher lorsque l\'écran est verrouillé.</string>
     <string name="label_detection_window">Fenêtre de détection (500ms – 10000ms)</string>
     <string name="current_value_ms">Valeur actuelle : %d ms</string>
 
@@ -66,6 +67,8 @@
     <string name="sequence_clear">Effacer</string>
     <string name="sequence_save">Enregistrer</string>
     <string name="phone_state_denied_message">La permission "Lire l\'état du téléphone" est nécessaire pour mettre en pause les déclencheurs de volume pendant les appels. Le déclencheur de volume ne peut pas être activé sans elle.</string>
+    <string name="label_rotation_trigger">Activer le déclencheur de rotation</string>
+    <string name="label_voice_trigger">Activer le déclencheur de l\'assistant vocal</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">Cette séquence est identique à l\'autre déclencheur. Choisissez-en une différente.</string>

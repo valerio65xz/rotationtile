@@ -13,7 +13,8 @@
     <string name="label_portrait_brightness">Luminosità verticale</string>
     <string name="label_landscape_brightness">Luminosità orizzontale</string>
     <string name="check_volume">Attivazione con tasti del volume</string>
-    <string name="volume_trigger_hint">Configura sequenze di tasti volume per attivare manualmente la rotazione con le tue impostazioni personalizzate, o l\'assistente vocale predefinito</string>
+    <string name="volume_trigger_hint">Configura sequenze di tasti volume per attivare manualmente la rotazione con le tue impostazioni personalizzate, o l\'assistente vocale predefinito.</string>
+    <string name="voice_lockscreen_note">Nota: se hai abilitato "Hey Google" nella schermata di blocco o il collegamento rapido all\'assistente vocale nelle impostazioni del dispositivo, l\'assistente vocale potrebbe attivarsi anche a schermo bloccato.</string>
     <string name="label_detection_window">Finestra di rilevamento (500ms – 10000ms)</string>
     <string name="current_value_ms">Valore attuale: %d ms</string>
 
@@ -66,6 +67,8 @@
     <string name="sequence_clear">Cancella</string>
     <string name="sequence_save">Salva</string>
     <string name="phone_state_denied_message">L\'autorizzazione "Leggi lo stato del telefono" è necessaria per mettere in pausa le sequenze volume durante le chiamate. Le sequenze volume non possono essere attivate senza di essa.</string>
+    <string name="label_rotation_trigger">Attiva il trigger di rotazione</string>
+    <string name="label_voice_trigger">Attiva il trigger dell\'assistente vocale</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">Questa sequenza è identica all\'altra. Scegline una diversa.</string>

@@ -13,7 +13,8 @@
     <string name="label_portrait_brightness">Portrait brightness</string>
     <string name="label_landscape_brightness">Landscape brightness</string>
     <string name="check_volume">Volume press trigger</string>
-    <string name="volume_trigger_hint">Configure volume sequence triggers to lunch manually the rotation with your custom settings, or the default vocal assistant</string>
+    <string name="volume_trigger_hint">Configure volume sequence triggers to lunch manually the rotation with your custom settings, or the default vocal assistant.</string>
+    <string name="voice_lockscreen_note">Note: if you have enabled \"Hey Google\" on the lock screen or the voice assistant lock screen shortcut in your device settings, the voice assistant may also be triggered while the screen is locked.</string>
     <string name="label_detection_window">Detection window (500ms – 10000ms)</string>
     <string name="current_value_ms">Current value: %d ms</string>
 
@@ -66,6 +67,8 @@
     <string name="sequence_clear">Clear</string>
     <string name="sequence_save">Save</string>
     <string name="phone_state_denied_message">The \"Read phone state\" permission is required to pause volume triggers during phone calls. The volume trigger cannot be enabled without it.</string>
+    <string name="label_rotation_trigger">Enable rotation trigger</string>
+    <string name="label_voice_trigger">Enable voice assistant trigger</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">This sequence is identical to the other trigger. Choose a different one.</string>

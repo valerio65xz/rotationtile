@@ -13,7 +13,8 @@
     <string name="label_portrait_brightness">Brillo en vertical</string>
     <string name="label_landscape_brightness">Brillo en horizontal</string>
     <string name="check_volume">Activación con botones de volumen</string>
-    <string name="volume_trigger_hint">Configura secuencias con los botones de volumen para activar manualmente la rotación con tu configuración personalizada, o el asistente de voz predeterminado</string>
+    <string name="volume_trigger_hint">Configura secuencias con los botones de volumen para activar manualmente la rotación con tu configuración personalizada, o el asistente de voz predeterminado.</string>
+    <string name="voice_lockscreen_note">Nota: si tienes activado "Hey Google" en la pantalla de bloqueo o el acceso directo al asistente de voz en los ajustes del dispositivo, el asistente de voz también podría activarse con la pantalla bloqueada.</string>
     <string name="label_detection_window">Ventana de detección (500ms – 10000ms)</string>
     <string name="current_value_ms">Valor actual: %d ms</string>
 
@@ -66,6 +67,8 @@
     <string name="sequence_clear">Borrar</string>
     <string name="sequence_save">Guardar</string>
     <string name="phone_state_denied_message">El permiso "Leer el estado del teléfono" es necesario para pausar las secuencias de volumen durante las llamadas. Las secuencias de volumen no se pueden activar sin él.</string>
+    <string name="label_rotation_trigger">Activar el disparador de rotación</string>
+    <string name="label_voice_trigger">Activar el disparador del asistente de voz</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">Esta secuencia es idéntica a la otra. Elige una diferente.</string>

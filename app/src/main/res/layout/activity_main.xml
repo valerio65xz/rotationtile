@@ -148,52 +148,100 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Configure rotation sequence -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/label_rotation_sequence"
-                android:textSize="13sp"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/tv_rotation_sequence_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="?android:attr/textColorSecondary"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btn_configure_rotation"
+            <!-- ── Rotation trigger ── -->
+            <CheckBox
+                android:id="@+id/check_rotation_trigger"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_configure_rotation"
-                android:layout_marginBottom="24dp"
-                style="?android:attr/borderlessButtonStyle" />
+                android:minHeight="48dp"
+                android:text="@string/label_rotation_trigger" />
 
-            <!-- Configure voice sequence -->
-            <TextView
+            <LinearLayout
+                android:id="@+id/layout_rotation_trigger"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/label_voice_sequence"
-                android:textSize="13sp"
-                android:layout_marginBottom="4dp" />
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="0dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/tv_voice_sequence_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="?android:attr/textColorSecondary"
-                android:layout_marginBottom="8dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_rotation_sequence"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp" />
 
-            <Button
-                android:id="@+id/btn_configure_voice"
+                <TextView
+                    android:id="@+id/tv_rotation_sequence_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btn_configure_rotation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_configure_rotation"
+                    style="?android:attr/borderlessButtonStyle" />
+
+            </LinearLayout>
+
+            <!-- ── Voice trigger ── -->
+            <CheckBox
+                android:id="@+id/check_voice_trigger"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_configure_voice"
-                style="?android:attr/borderlessButtonStyle" />
+                android:minHeight="48dp"
+                android:text="@string/label_voice_trigger" />
+
+            <LinearLayout
+                android:id="@+id/layout_voice_trigger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="0dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_voice_sequence"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_voice_sequence_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btn_configure_voice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_configure_voice"
+                    style="?android:attr/borderlessButtonStyle" />
+
+            </LinearLayout>
+
+            <!-- Voice assistant lock screen note -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/voice_lockscreen_note"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginTop="8dp" />
 
         </LinearLayout>
 

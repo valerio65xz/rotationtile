@@ -14,6 +14,7 @@
     <string name="label_landscape_brightness">Helligkeit im Querformat</string>
     <string name="check_volume">Auslösung über Lautstärketasten</string>
     <string name="volume_trigger_hint">Konfiguriere Lautstärketasten-Sequenzen, um die Drehung oder den Standard-Sprachassistenten manuell auszulösen</string>
+    <string name="voice_lockscreen_note">Hinweis: Wenn du „Hey Google" auf dem Sperrbildschirm oder die Sprachassistent-Schnellzugriff-Schaltfläche in den Geräteeinstellungen aktiviert hast, kann der Sprachassistent auch bei gesperrtem Bildschirm ausgelöst werden.</string>
     <string name="label_detection_window">Erkennungsfenster (500ms – 10000ms)</string>
     <string name="current_value_ms">Aktueller Wert: %d ms</string>
 
@@ -66,6 +67,8 @@
     <string name="sequence_clear">Löschen</string>
     <string name="sequence_save">Speichern</string>
     <string name="phone_state_denied_message">Die Berechtigung "Telefonstatus lesen" ist erforderlich, um Lautstärke-Auslöser während Anrufen zu pausieren. Der Lautstärke-Auslöser kann ohne diese Berechtigung nicht aktiviert werden.</string>
+    <string name="label_rotation_trigger">Dreh-Auslöser aktivieren</string>
+    <string name="label_voice_trigger">Sprachassistent-Auslöser aktivieren</string>
 
     <!-- Sequence validation errors -->
     <string name="sequence_error_equal">Diese Sequenz ist identisch mit dem anderen Auslöser. Wähle eine andere.</string>

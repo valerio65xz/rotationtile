@@ -68,16 +68,18 @@ public class VolumeButtonService extends AccessibilityService {
         List<Integer> voiceSeq = parseSequence(prefs.getString(
                 MainActivity.PREF_VOICE_SEQUENCE, DEFAULT_VOICE));
 
-        // Check rotation match
-        if (bufferEndsWith(rotationSeq)) {
+        // Check rotation match — only if rotation trigger is enabled
+        if (prefs.getBoolean(MainActivity.PREF_ROTATION_TRIGGER_ENABLED, true)
+                && bufferEndsWith(rotationSeq)) {
             buffer.clear();
             lastPressTime = 0;
             onRotationTriggered(prefs);
             return true;
         }
 
-        // Check voice match
-        if (bufferEndsWith(voiceSeq)) {
+        // Check voice match — only if voice trigger is enabled
+        if (prefs.getBoolean(MainActivity.PREF_VOICE_TRIGGER_ENABLED, true)
+                && bufferEndsWith(voiceSeq)) {
             buffer.clear();
             lastPressTime = 0;
             onVoiceTriggered();
@@ -131,8 +133,8 @@ public class VolumeButtonService extends AccessibilityService {
         if (SequenceActivity.isRecording) return true;
 
         // Pause if a phone call is in progress
-        android.telephony.TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        android.telephony.TelephonyManager tm =
+                (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         return tm != null && tm.getCallState() != TelephonyManager.CALL_STATE_IDLE;
     }
-
 }

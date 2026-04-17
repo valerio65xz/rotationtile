@@ -22,14 +22,16 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String PREFS_NAME = "RotationTilePrefs";
-    public static final String PREF_COLLAPSE = "collapse_on_toggle";
-    public static final String PREF_BRIGHTNESS_ENABLED = "brightness_enabled";
-    public static final String PREF_BRIGHTNESS_PORTRAIT = "brightness_portrait";
-    public static final String PREF_BRIGHTNESS_LANDSCAPE = "brightness_landscape";
+    public static final String PREFS_NAME                    = "RotationTilePrefs";
+    public static final String PREF_COLLAPSE                 = "collapse_on_toggle";
+    public static final String PREF_BRIGHTNESS_ENABLED       = "brightness_enabled";
+    public static final String PREF_BRIGHTNESS_PORTRAIT      = "brightness_portrait";
+    public static final String PREF_BRIGHTNESS_LANDSCAPE     = "brightness_landscape";
     public static final String PREF_VOLUME_TRIGGER_WINDOW_MS = "volume_trigger_window_ms";
-    public static final String PREF_ROTATION_SEQUENCE = "rotation_sequence";
-    public static final String PREF_VOICE_SEQUENCE    = "voice_sequence";
+    public static final String PREF_ROTATION_SEQUENCE        = "rotation_sequence";
+    public static final String PREF_VOICE_SEQUENCE           = "voice_sequence";
+    public static final String PREF_ROTATION_TRIGGER_ENABLED = "rotation_trigger_enabled";
+    public static final String PREF_VOICE_TRIGGER_ENABLED    = "voice_trigger_enabled";
 
     private static final int REQUEST_PHONE_STATE = 1001;
 
@@ -45,7 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkVolume;
     private LinearLayout layoutVolumeWindow;
     private SeekBar seekVolumeWindow;
+    private CheckBox checkRotationTrigger;
+    private LinearLayout layoutRotationTrigger;
     private TextView tvRotationSequencePreview;
+    private CheckBox checkVoiceTrigger;
+    private LinearLayout layoutVoiceTrigger;
     private TextView tvVoiceSequencePreview;
 
     @Override
@@ -135,7 +141,11 @@ public class MainActivity extends AppCompatActivity {
         checkVolume               = findViewById(R.id.check_volume);
         layoutVolumeWindow        = findViewById(R.id.layout_volume_window);
         seekVolumeWindow          = findViewById(R.id.seek_volume_window);
+        checkRotationTrigger      = findViewById(R.id.check_rotation_trigger);
+        layoutRotationTrigger     = findViewById(R.id.layout_rotation_trigger);
         tvRotationSequencePreview = findViewById(R.id.tv_rotation_sequence_preview);
+        checkVoiceTrigger         = findViewById(R.id.check_voice_trigger);
+        layoutVoiceTrigger        = findViewById(R.id.layout_voice_trigger);
         tvVoiceSequencePreview    = findViewById(R.id.tv_voice_sequence_preview);
     }
 
@@ -153,8 +163,15 @@ public class MainActivity extends AppCompatActivity {
         layoutVolumeWindow.setVisibility(volumeEnabled ? View.VISIBLE : View.GONE);
         seekVolumeWindow.setProgress(prefs.getInt(PREF_VOLUME_TRIGGER_WINDOW_MS, 5000) - 500);
 
+        boolean rotationTriggerEnabled = prefs.getBoolean(PREF_ROTATION_TRIGGER_ENABLED, true);
+        checkRotationTrigger.setChecked(rotationTriggerEnabled);
+        layoutRotationTrigger.setVisibility(rotationTriggerEnabled ? View.VISIBLE : View.GONE);
         tvRotationSequencePreview.setText(sequenceToReadable(
                 prefs.getString(PREF_ROTATION_SEQUENCE, "0,0,0,0,0")));
+
+        boolean voiceTriggerEnabled = prefs.getBoolean(PREF_VOICE_TRIGGER_ENABLED, true);
+        checkVoiceTrigger.setChecked(voiceTriggerEnabled);
+        layoutVoiceTrigger.setVisibility(voiceTriggerEnabled ? View.VISIBLE : View.GONE);
         tvVoiceSequencePreview.setText(sequenceToReadable(
                 prefs.getString(PREF_VOICE_SEQUENCE, "1,1,1,1,1")));
     }
@@ -208,6 +225,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Rotation trigger checkbox
+        checkRotationTrigger.setOnCheckedChangeListener((btn, isChecked) -> {
+            prefs.edit().putBoolean(PREF_ROTATION_TRIGGER_ENABLED, isChecked).apply();
+            layoutRotationTrigger.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
+        // Voice trigger checkbox
+        checkVoiceTrigger.setOnCheckedChangeListener((btn, isChecked) -> {
+            prefs.edit().putBoolean(PREF_VOICE_TRIGGER_ENABLED, isChecked).apply();
+            layoutVoiceTrigger.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
         // Sequence configure buttons
         findViewById(R.id.btn_configure_rotation).setOnClickListener(v -> {
             Intent intent = new Intent(this, SequenceActivity.class);
@@ -228,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
             showVolumeTriggerPermissionDialog();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this, android.Manifest.permission.READ_PHONE_STATE)) {
-            // First denial — can ask again via system dialog
             ActivityCompat.requestPermissions(
                     this,
                     new String[]{android.Manifest.permission.READ_PHONE_STATE},
@@ -262,10 +290,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_PHONE_STATE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Granted — proceed to accessibility check
                 showVolumeTriggerPermissionDialog();
             } else {
-                // Denied — warn user and keep checkbox unchecked
                 checkVolume.setChecked(false);
             }
         }
@@ -304,7 +330,7 @@ public class MainActivity extends AppCompatActivity {
         addGoToButton(layout, getString(R.string.enable_accessibility_button_label),
                 this::openAccessibilitySettings);
 
-        // ── Warning: banking/sensitive apps ──────────────────────────────────  ← ADD HERE
+        // ── Warning: banking/sensitive apps ───────────────────────────────────
         addDivider(layout);
         addSectionTitle(layout, getString(R.string.accessibility_warning_title));
         addBody(layout, getString(R.string.accessibility_warning_message));
